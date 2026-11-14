@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "node src/server.js",
+    "build": "npm --prefix ../frontend install && npm --prefix ../frontend run build && npm install",
     "test": "node --test"
   },
   "dependencies": {

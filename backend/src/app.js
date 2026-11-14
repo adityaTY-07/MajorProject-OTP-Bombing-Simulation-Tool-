@@ -25,7 +25,13 @@ export function createApplication() {
   const requestService = createRequestService({ state, telemetry });
 
   app.disable("x-powered-by");
-  app.use(helmet());
+  app.set("trust proxy", 1);
+  app.use(
+    helmet({
+      contentSecurityPolicy: false,
+      crossOriginEmbedderPolicy: false
+    })
+  );
   app.use(express.json({ limit: "4kb" }));
   const corsMiddleware = cors({
     origin(origin, callback) {
@@ -37,15 +43,19 @@ export function createApplication() {
   });
   app.use((req, res, next) => {
     const origin = req.get("origin");
-    const requestOrigin = `${req.protocol}://${req.get("host")}`;
-    if (origin && origin === requestOrigin) return next();
+    const host = req.get("host");
+    const isSameHost = origin === `http://${host}` || origin === `https://${host}`;
+    if (origin && isSameHost) return next();
     corsMiddleware(req, res, next);
   });
   app.get("/healthz", (_req, res) => res.json({ status: "ok", storage: "in-memory" }));
   app.use("/api", createApiRoutes({ state, telemetry, demoService, requestService }));
-  // Serve the checked-in frontend build from the same origin as the API.
-  app.use(express.static(frontendDist, { index: false }));
-  app.get("/", (_req, res, next) => {
+  // Serve the frontend build
+  app.use(express.static(frontendDist));
+  app.use((req, res, next) => {
+    if (req.method !== "GET" || req.path.startsWith("/api") || req.path === "/healthz") {
+      return next();
+    }
     res.sendFile(frontendIndex, (error) => {
       if (error) next(error);
     });
