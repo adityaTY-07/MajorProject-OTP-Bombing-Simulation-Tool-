@@ -1,6 +1,6 @@
 import { createApplication } from "./app.js";
 
-const host = process.env.HOST ?? "0.0.0.0";
+const host = process.env.HOST ?? "127.0.0.1";
 const port = Number(process.env.PORT ?? 8080);
 const { httpServer, sockets, state, demoService } = createApplication();
 
