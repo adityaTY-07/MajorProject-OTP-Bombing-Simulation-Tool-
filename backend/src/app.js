@@ -52,8 +52,9 @@ export function createApplication() {
 
   sockets.on("connection", (socket, request) => {
     const origin = request.headers.origin;
-    const requestOrigin = `http://${request.headers.host}`;
-    if (origin && origin !== requestOrigin && !allowedOrigins.has(origin)) {
+    const isSameHost =
+      origin === `http://${request.headers.host}` || origin === `https://${request.headers.host}`;
+    if (origin && !isSameHost && !allowedOrigins.has(origin)) {
       socket.close(1008, "Origin is not allowed");
       return;
     }
