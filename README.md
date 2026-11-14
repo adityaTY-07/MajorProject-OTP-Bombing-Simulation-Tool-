@@ -1,63 +1,71 @@
-# OTP Security Sandbox
+# OTP Security Sandbox & Simulation Tool
 
-A small, local-only mock OTP application. The backend runs in your terminal,
-and the React dashboard sends it manual test input and displays live telemetry.
-No real OTPs are created or sent.
+[![Live Deployment](https://img.shields.io/badge/Live%20Demo-Render-10b981?style=for-the-badge&logo=render&logoColor=white)](https://majorproject-otp-bombing-simulation-tool-2trl.onrender.com/)
 
-## Requirements
+> 🌐 **Live Demo:** [https://majorproject-otp-bombing-simulation-tool-2trl.onrender.com/](https://majorproject-otp-bombing-simulation-tool-2trl.onrender.com/)
 
-- Node.js 22 or newer
+A modern educational security benchmarking and simulation sandbox. The tool demonstrates SMS/OTP high-frequency request bursts, token-bucket rate limiting, exponential backoff, and defensive controls with real-time WebSocket telemetry and analytics. No real external OTPs or SMS messages are sent.
+
+---
+
+## Features
+
+- **Interactive Simulation Sandbox:** Test manual simulated OTP calls or generate controlled synthetic bursts.
+- **Defensive Security Controls:** Live toggleable token-bucket rate limiting, exponential backoff penalties, and autonomous IP blacklisting.
+- **Real-Time Telemetry:** Instant WebSocket stream displaying accepted vs limited request volumes, latency graphs, and system resource metrics.
+- **Modern React & Vite Architecture:** High-tech cybersecurity HUD dark theme with responsive layouts and component architecture.
+
+---
+
+## Tech Stack
+
+- **Frontend:** React 18, Vite, Custom Cyber Dark Theme CSS, WebSockets API
+- **Backend:** Node.js, Express, Helmet, CORS, `ws` (WebSocket Server), In-memory Token Bucket State Engine
+- **Deployment:** Render Web Service (Node.js runtime with reverse proxy trust)
+
+---
+
+## Getting Started Locally
+
+### Requirements
+- Node.js 20 or newer
 - npm
 
-## Start the app
-
-From the project directory:
-
+### 1. Install & Build Frontend
 ```sh
-npm --prefix backend install
-npm run dev
+cd frontend
+npm install
+npm run build
+cd ..
 ```
 
-The backend serves the existing built dashboard and API from one local server.
-Open <http://127.0.0.1:8080>. Use the recipient field and **Test request**
-button to submit input; the backend handles it locally and streams outcomes to
-the dashboard over WebSocket.
-
-Stop both processes with `Ctrl+C`.
-
-## Defensive behavior
-
-- The service binds to `127.0.0.1` by default.
-- The in-memory token bucket allows a burst of five requests and replenishes
-  at five requests per minute per direct client address.
-- Rate limiting, exponential backoff, and temporary blocking can be toggled
-  from the dashboard.
-- Request metrics and rate-limit state are kept in process memory and reset
-  when the backend stops.
-- The optional synthetic demo emits labeled fake events locally for the
-  dashboard. It sends no requests, changes no request counters, and is capped
-  at 30 seconds and four events per second.
-- There is no Docker, Redis, or SMS provider.
-
-## Tests
-
-Run the integration tests with:
-
+### 2. Install & Start Backend
 ```sh
-npm test
+cd backend
+npm install
+npm start
 ```
 
-Each test starts its own temporary backend process on loopback, giving it fresh
-in-memory state. The suite checks accepted mock input, rate limiting, and
-WebSocket telemetry.
+Open **`http://127.0.0.1:8080`** in your browser to interact with the dashboard.
 
-## API
+---
 
-- `GET /healthz` — backend status
-- `GET /api/config` — current defensive configuration
-- `PUT /api/config` — update all three defensive settings
-- `POST /api/request-otp` — mock request with `{"recipient":"demo-user"}`
-- `POST /api/demo/start` — start a bounded local synthetic event stream
-- `POST /api/demo/stop` — stop the synthetic stream
-- `GET /api/demo/status` — view synthetic demo state
-- `WS /ws` — live metrics and event stream
+## Defensive Behaviors
+
+- **Token Bucket Algorithm:** 5 tokens burst capacity per client, smoothly refilled at 5 tokens per minute.
+- **Exponential Backoff:** Progressively multiplies Retry-After delay windows for repeated burst triggers.
+- **Autonomous IP Blacklisting:** Temporarily denies clients that exceed sustained denial thresholds.
+- **Safe Local Isolation:** All traffic is simulated in-memory; no third-party SMS providers, carrier charges, or external network requests are made.
+
+---
+
+## API Endpoints
+
+- `GET /healthz` — Service health status
+- `GET /api/config` — Current defensive security settings
+- `PUT /api/config` — Update active defensive rules
+- `POST /api/request-otp` — Evaluate a mock request (`{"recipient":"+1-555-0199"}`)
+- `POST /api/demo/start` — Start synthetic local burst stream
+- `POST /api/demo/stop` — Stop synthetic stream
+- `GET /api/demo/status` — Status of synthetic demo
+- `WS /ws` — Real-time telemetry snapshot and event stream
