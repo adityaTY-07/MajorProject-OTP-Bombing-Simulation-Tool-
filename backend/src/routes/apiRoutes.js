@@ -3,11 +3,11 @@ import { createConfigController } from "../controllers/configController.js";
 import { createDemoController } from "../controllers/demoController.js";
 import { createRequestController } from "../controllers/requestController.js";
 
-export function createApiRoutes({ state, telemetry, demoService }) {
+export function createApiRoutes({ state, telemetry, demoService, requestService }) {
   const router = Router();
   const configController = createConfigController({ state, telemetry });
   const demoController = createDemoController({ demoService });
-  const requestController = createRequestController({ state, telemetry });
+  const requestController = createRequestController({ requestService });
 
   router.get("/config", configController.get);
   router.put("/config", configController.update);

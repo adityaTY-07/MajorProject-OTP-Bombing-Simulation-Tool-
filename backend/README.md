@@ -20,9 +20,11 @@ src/
 
 - **Model** (`models/sandboxState.js`) owns in-memory configuration, metrics,
   token buckets, and client defense state.
-- **Controllers** validate HTTP input and coordinate model/service calls.
+- **Controllers** validate HTTP input and translate application results to HTTP
+  responses.
 - **Routes** map API paths to controller methods.
-- **Services** implement telemetry delivery and bounded synthetic event timing.
+- **Services** implement request-policy orchestration, telemetry delivery, and
+  bounded synthetic event timing.
 - **App/server** configure Express and WebSockets, then start and stop the
   local process.
 

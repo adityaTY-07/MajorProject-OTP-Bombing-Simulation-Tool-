@@ -118,6 +118,9 @@ describe("OTP sandbox integration", () => {
 
     assert.equal(statuses.filter((status) => status === 202).length, 5);
     assert.equal(statuses.filter((status) => status === 429).length, 1);
+    const limitedResponse = responses.find(({ status }) => status === 429);
+    assert.ok(Number(limitedResponse.headers.get("retry-after")) > 0);
+    assert.match((await limitedResponse.json()).error, /Retry delay applied/);
   });
 
   it("rejects synthetic demo limits above the configured safety caps", async () => {

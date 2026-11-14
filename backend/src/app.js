@@ -8,6 +8,7 @@ import { errorHandler } from "./middleware/errorHandler.js";
 import { createSandboxState } from "./models/sandboxState.js";
 import { createApiRoutes } from "./routes/apiRoutes.js";
 import { createDemoService } from "./services/demoService.js";
+import { createRequestService } from "./services/requestService.js";
 import { createTelemetryService } from "./services/telemetryService.js";
 
 const allowedOrigins = new Set(["http://127.0.0.1:5173", "http://localhost:5173"]);
@@ -21,6 +22,7 @@ export function createApplication() {
   const sockets = new WebSocketServer({ server: httpServer, path: "/ws" });
   const telemetry = createTelemetryService({ state, sockets });
   const demoService = createDemoService({ state, telemetry });
+  const requestService = createRequestService({ state, telemetry });
 
   app.disable("x-powered-by");
   app.use(helmet());
@@ -40,7 +42,7 @@ export function createApplication() {
     corsMiddleware(req, res, next);
   });
   app.get("/healthz", (_req, res) => res.json({ status: "ok", storage: "in-memory" }));
-  app.use("/api", createApiRoutes({ state, telemetry, demoService }));
+  app.use("/api", createApiRoutes({ state, telemetry, demoService, requestService }));
   // Serve the checked-in frontend build from the same origin as the API.
   app.use(express.static(frontendDist, { index: false }));
   app.get("/", (_req, res, next) => {
@@ -61,5 +63,5 @@ export function createApplication() {
     telemetry.sendSnapshot(socket);
   });
 
-  return { app, httpServer, sockets, state, telemetry, demoService };
+  return { app, httpServer, sockets, state, telemetry, demoService, requestService };
 }
