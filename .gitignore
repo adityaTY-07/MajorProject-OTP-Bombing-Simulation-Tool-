@@ -7,4 +7,6 @@ node_modules/
 dist/
 coverage/
 npm-debug.log*
-
+!frontend/
+!frontend/dist/
+!frontend/dist/**
